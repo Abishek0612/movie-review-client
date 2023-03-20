@@ -8,7 +8,7 @@ export const AuthContext = createContext()
 const defaultAuthInfo = {
     profile: null,
     isLoggedIn: false,
-    isPending: true,
+    isPending: false,
     error: ''
 }
 
@@ -27,7 +27,7 @@ export default function AuthProvider({ children }) {
             return setAuthInfo({ ...authInfo, isPending: false, error });
         }
 
-        setAuthInfo({ profile: { ...user }, isPending: false, isLoggedIn: '', error: '' })
+        setAuthInfo({ profile: { ...user }, isPending: false, isLoggedIn: 'true', error: '' })
 
         // token coming from backend
         localStorage.setItem('auth-token', user.token)
@@ -45,10 +45,17 @@ export default function AuthProvider({ children }) {
 
         setAuthInfo({
             profile: { ...user },
-            isPending: false, isLoggedIn: '', error: ''
+            isPending: false, isLoggedIn: true, error: ''
         })
 
     }
+
+    // handling logout 
+    const handleLogout = () => {
+        localStorage.removeItem('auth-token')
+        setAuthInfo({ ...defaultAuthInfo })
+    }
+
 
     useEffect(() => {
         isAuth()
@@ -56,7 +63,7 @@ export default function AuthProvider({ children }) {
 
     // handleLogout, isAuth
     return (
-        <AuthContext.Provider value={{ authInfo, handleLogin, isAuth }}>
+        <AuthContext.Provider value={{ authInfo, handleLogin, handleLogout, isAuth }}>
             {children}
         </AuthContext.Provider>
     )

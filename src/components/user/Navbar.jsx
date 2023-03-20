@@ -8,7 +8,9 @@ const Navbar = () => {
   const { toggleTheme } = useTheme();
   // toggle theme is coming from ThemeProvider.js coz imported ThemeProvider.js inside custom-hooks 
   // so we are importing here like const { toggleTheme} = useTheme( )
-  const { authInfo } = useAuth()
+  
+  // handleLogout coming from authprovider.jsx
+  const { authInfo , handleLogout} = useAuth()
   // we are destructuring isLoggedIn coz when we log in we will have log out button
   const { isLoggedIn } = authInfo;
 
@@ -26,16 +28,17 @@ const Navbar = () => {
                 <BsFillSunFill onClick={toggleTheme} className='text-secondary' size={24} />
               </button>
             </li>
-            <input type='text' className='border-2 border-dark-subtle p-1 rounded 
-             bg-transparent text-xl outline-none focus:border-white transition text-white'
-
-              placeholder='search...' />
             <li>
-              {isLoggedIn ? (
-                <button className='text-white font-semibold text-lg'>
+              <input type='text' className='border-2 border-dark-subtle p-1 rounded 
+             bg-transparent text-xl outline-none focus:border-white transition text-white'
+                placeholder='search...' />
+            </li>
+            <li>
+              { isLoggedIn ? (
+                <button onClick={handleLogout} className='text-white font-semibold text-lg'>
                   Log out
-                </button> 
-                )
+                </button>
+              )
                 : (
                   <Link className='text-white font-semibold text-lg' to='/auth/signin'>
                     Login

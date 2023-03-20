@@ -9,7 +9,7 @@ import FormContainer from '../form/FormContainer';
 import Submit from '../form/Submit'
 import Title from '../form/Title'
 import { verifyUserEmail } from '../../api/auth';
-import { useNotification } from '../../custom-hooks';
+import { useAuth, useNotification } from '../../custom-hooks';
 
 const OTP_LENGTH = 6;
 
@@ -35,10 +35,13 @@ export default function EmailVerification() {
   const [otp, setOtp] = useState(new Array(OTP_LENGTH).fill(''));
   const [activeOtpIndex, setActiveOtpIndex] = useState(0)
 
+  const {isAuth, authInfo} =useAuth()
+  const {isLoggedIn} = authInfo
+
   const inputRef = useRef()
 
   // useNotification coming from custom-hooks /index.js
-  const {updateNotification} = useNotification()
+  const { updateNotification } = useNotification()
 
   // when ever we want to verify the email we need to verify this user id and we need to verify userid and otp  to verify the email
   const { state } = useLocation();
@@ -82,22 +85,27 @@ export default function EmailVerification() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!isValidOTP(otp)) return updateNotification('error','invalid OTP')
+    if (!isValidOTP(otp)) return updateNotification('error', 'invalid OTP')
 
     // capital OTP coming from backend we mentioned it in capital  in the backend
     //submit otp
-    const { error, message } = await verifyUserEmail({ OTP: otp.join(''), userId: user.id })
+    // inside the userResponse we will be having that token coming from backend
+    const { error, message, user: userResponse } = await verifyUserEmail({ OTP: otp.join(''), userId: user.id })
     // "error" coming from NotficationProvider type is error
-    if(error) return updateNotification('error',error)
+    if (error) return updateNotification('error', error)
 
     // "success" coming from NotficationProvider type is error
     updateNotification('success', message)
+    localStorage.setItem('auth-token', userResponse.token)
+    isAuth();
   }
 
   // if there is no user it will land in to page not found
   useEffect(() => {
     if (!user) navigate('/not-found')
-  }, [user])
+    // if we log in we will be go to home page isLoggedIn imported at the top
+    if (isLoggedIn) navigate('/')
+  }, [user, isLoggedIn])
 
   if (!user) return null;
 
