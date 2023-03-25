@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react'
 import { getIsAuth, signInUser } from '../api/auth'
+import { useNotification } from '../custom-hooks'
 
 // AuthProvider.js is for sign in purpose ...i mean this file only
 // exporting it to custom-hooks/index.js
@@ -15,7 +16,7 @@ const defaultAuthInfo = {
 export default function AuthProvider({ children }) {
 
     const [authInfo, setAuthInfo] = useState({ ...defaultAuthInfo })
-
+    const {updateNotification} = useNotification()
 
     // signInUser coming from api/auth.js
     //  we are passing email and password inside signInUser coz from backend we are accepting inside body email and password in controllers.js in backend
@@ -24,6 +25,7 @@ export default function AuthProvider({ children }) {
         setAuthInfo({ ...authInfo, isPending: true })
         const { error, user } = await signInUser({ email, password })
         if (error) {
+            updateNotification('error', error)
             return setAuthInfo({ ...authInfo, isPending: false, error });
         }
 
@@ -40,6 +42,7 @@ export default function AuthProvider({ children }) {
         setAuthInfo({ ...authInfo, isPending: true })
         const { error, user } = await getIsAuth(token)
         if (error) {
+            updateNotification('error', error)
             return setAuthInfo({ ...authInfo, isPending: false, error })
         }
 

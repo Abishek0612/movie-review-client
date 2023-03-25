@@ -60,3 +60,61 @@ export const getIsAuth = async (token) => {
         return { error: error.message || error };
     }
 }
+
+
+export const forgetPassword = async (email) => {
+    try {
+        const { data } = await client.post("/user/forget-password", { email })
+        return data;
+    } catch (error) {
+        // console.log(error.response?.data)
+        const { response } = error;
+        if (response?.data) return response.data;
+
+        return { error: error.message || error };
+    }
+}
+
+
+// verify password reset token
+// we are sending token from the backend to verify the userId
+export const verifyPassResetToken = async (token, userId) => {
+    try {
+        const { data } = await client.post("/user/verify-pass-reset-token", { token, userId })
+        return data;
+    } catch (error) {
+        // console.log(error.response?.data)
+        const { response } = error;
+        if (response?.data) return response.data;
+
+        return { error: error.message || error };
+    }
+}
+
+// for reseting password we are just accepting passwordInfo ...we just named it on our own
+export const resetPassword = async (passwordInfo) => {
+    try {
+        const { data } = await client.post("/user/reset-password", passwordInfo)
+        return data;
+    } catch (error) {
+        // console.log(error.response?.data)
+        const { response } = error;
+        if (response?.data) return response.data;
+
+        return { error: error.message || error };
+    }
+}
+
+//for resend Email verification OTP
+export const resendEmailVerificationToken = async (userId) => {
+    try {
+        const { data } = await client.post("/user/resend-email-verification-token", {userId})
+        return data;
+    } catch (error) {
+        // console.log(error.response?.data)
+        const { response } = error;
+        if (response?.data) return response.data;
+
+        return { error: error.message || error };
+    }
+}

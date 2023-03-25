@@ -6,10 +6,10 @@ import NotificationProvider from './NotificationProvider'
 
 export default function ContextProvider({ children }) {
     return (
-        <AuthProvider>
         <NotificationProvider>
-            <ThemeProvider >{children}</ThemeProvider>
+            <AuthProvider>
+                <ThemeProvider >{children}</ThemeProvider>
+            </AuthProvider>
         </NotificationProvider>
-        </AuthProvider>
     )
 }

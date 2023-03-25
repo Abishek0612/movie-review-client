@@ -8,7 +8,7 @@ import Container from '../Container'
 import FormContainer from '../form/FormContainer';
 import Submit from '../form/Submit'
 import Title from '../form/Title'
-import { verifyUserEmail } from '../../api/auth';
+import { resendEmailVerificationToken, verifyUserEmail } from '../../api/auth';
 import { useAuth, useNotification } from '../../custom-hooks';
 
 const OTP_LENGTH = 6;
@@ -35,8 +35,10 @@ export default function EmailVerification() {
   const [otp, setOtp] = useState(new Array(OTP_LENGTH).fill(''));
   const [activeOtpIndex, setActiveOtpIndex] = useState(0)
 
-  const {isAuth, authInfo} =useAuth()
-  const {isLoggedIn} = authInfo
+  const { isAuth, authInfo } = useAuth()
+  const { isLoggedIn, profile } = authInfo;
+  //isVerified we are using here coz in Home.js if the user is not verified need to verify through email verification
+  const isVerified = profile?.isVerified;
 
   const inputRef = useRef()
 
@@ -75,6 +77,15 @@ export default function EmailVerification() {
     inputRef.current?.focus();
   }, [activeOtpIndex])
 
+
+  const handleOTPResend = async () => {
+    const { error, message } = await resendEmailVerificationToken(user.id)
+
+    if (error) return updateNotification('error', error)
+
+    updateNotification('success', message)
+  }
+
   const handleKeyDown = ({ key }, index) => {
     currentOTPIndex = index;
     if (key === 'Backspace') {
@@ -101,11 +112,12 @@ export default function EmailVerification() {
   }
 
   // if there is no user it will land in to page not found
+  //if the user isLoggedIn and isVerified then only we will navigate to Home route
   useEffect(() => {
     if (!user) navigate('/not-found')
     // if we log in we will be go to home page isLoggedIn imported at the top
-    if (isLoggedIn) navigate('/')
-  }, [user, isLoggedIn])
+    if (isLoggedIn && isVerified) navigate('/')
+  }, [user, isLoggedIn, isVerified])
 
   if (!user) return null;
 
@@ -135,7 +147,14 @@ export default function EmailVerification() {
             }
           </div>
 
-          <Submit value='Verify Account' />
+          <div>
+            <Submit value='Verify Account' />
+
+            <button
+              onClick={handleOTPResend}
+              type='button' className='dark:text-white
+             text-blue-500 font-semibold hover:underline mt-2'>I don't have OTP</button>
+          </div>
 
         </form>
       </Container>
